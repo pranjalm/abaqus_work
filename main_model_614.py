@@ -116,6 +116,35 @@ p = mdb.models['test'].Part(name='sleeper', dimensionality=THREE_D, type=DEFORMA
 p = mdb.models['test'].parts['sleeper']
 p.BaseSolidExtrude(sketch=s, depth=1.375)
 
+#sleeper1 sketch
+s = mdb.models['test'].ConstrainedSketch(name='sleeper1', sheetSize=10.0)
+g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
+s.setPrimaryObject(option=STANDALONE)
+s.Line(point1=(0.0, 0.0), point2=(0.125, 0.0))
+s.Line(point1=(0.125, 0.0), point2=(0.075, 0.21))
+s.Line(point1=(0.075, 0.21), point2=(0.0, 0.21))
+s.Line(point1=(0.0, 0.21), point2=(0.0,0.0))
+
+#sleeper1 part
+p = mdb.models['test'].Part(name='sleeper1', dimensionality=THREE_D, type=DEFORMABLE_BODY)
+p = mdb.models['test'].parts['sleeper1']
+p.BaseSolidExtrude(sketch=s, depth=1.375)
+
+
+#sleeper2 sketch
+s = mdb.models['test'].ConstrainedSketch(name='sleeper2', sheetSize=10.0)
+g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
+s.setPrimaryObject(option=STANDALONE)
+s.Line(point1=(0.0, 0.0), point2=(-0.125, 0.0))
+s.Line(point1=(-0.125, 0.0), point2=(-0.075, 0.21))
+s.Line(point1=(-0.075, 0.21), point2=(0.0, 0.21))
+s.Line(point1=(0.0, 0.21), point2=(0.0,0.0))
+
+#sleeper2 part
+p = mdb.models['test'].Part(name='sleeper2', dimensionality=THREE_D, type=DEFORMABLE_BODY)
+p = mdb.models['test'].parts['sleeper2']
+p.BaseSolidExtrude(sketch=s, depth=1.375)
+
 
 #rail sketch
 s = mdb.models['test'].ConstrainedSketch(name='rail', sheetSize=10.0)
@@ -206,18 +235,15 @@ cells = c.getSequenceFromMask(mask=('[#4 ]', ), )
 region = p.Set(cells=cells, name='Set-1')
 p = mdb.models['test'].parts['infi_1']
 p.SectionAssignment(region=region, sectionName='soil_section', offset=0.0, 
-    offsetType=MIDDLE_SURFACE, offsetField='', 
-    thicknessAssignment=FROM_SECTION)
+    offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 cells = c.getSequenceFromMask(mask=('[#2 ]', ), )
 region = p.Set(cells=cells, name='Set-2')
 p.SectionAssignment(region=region, sectionName='subballast_section', 
-    offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', 
-    thicknessAssignment=FROM_SECTION)
+    offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 cells = c.getSequenceFromMask(mask=('[#1 ]', ), )
 region = p.Set(cells=cells, name='Set-3')
 p.SectionAssignment(region=region, sectionName='ballast_section', offset=0.0, 
-    offsetType=MIDDLE_SURFACE, offsetField='', 
-    thicknessAssignment=FROM_SECTION)
+    offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 
 #side_2
 p1 = mdb.models['test'].parts['infi_1']
@@ -230,13 +256,15 @@ p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#2 ]', ), ), name='blst')
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#20000 ]', ), ), name='sbblst')
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#20 ]', ), ), name='soil')
 p.Set(faces=s.getSequenceFromMask(mask=('[#141cc ]', ), ), name='roller')
+p.Set(faces=s.getSequenceFromMask(mask=('[#8000 ]', ), ), name='fixed')
+
 #infi_1 partitioning
 c = p.cells
 pickedCells = c.getSequenceFromMask(mask=('[#7 ]', ), )
 e1, v2, d2 = p.edges, p.vertices, p.datums
 p.PartitionCellByPlanePointNormal(normal=e1[32], cells=pickedCells, 
     point=p.InterestingPoint(edge=e1[32], rule=MIDDLE))
-    
+ 
 #infi_2 surface assignment
 p = mdb.models['test'].parts['infi_2']
 s = p.faces
@@ -244,6 +272,8 @@ p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#40 ]', ), ), name='blst')
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#8 ]', ), ), name='sbblst')
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#10000 ]', ), ), name='soil')
 p.Set(faces=s.getSequenceFromMask(mask=('[#241a6 ]', ), ), name='roller')
+p.Set(faces=s.getSequenceFromMask(mask=('[#8000 ]', ), ), name='fixed')
+
 #infi_2 partitioning
 c = p.cells
 pickedCells = c.getSequenceFromMask(mask=('[#7 ]', ), )
@@ -328,41 +358,19 @@ s = p.faces
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#1 ]', ), ), name='rim')
 
 p = mdb.models['test'].parts['wheel']
-v, e, c = p.vertices, p.edges, p.cells
+v, e, c, d = p.vertices, p.edges, p.cells, p.datums
 
 p.DatumPlaneByTwoPoint(point1=v[0], point2=v[1])#, isDependent=False)
 p.DatumPlaneByTwoPoint(point2=v[0], point1=p.InterestingPoint(edge=e[0], 
     rule=MIDDLE))#, isDependent=False)
 p.DatumPlaneByThreePoints(point2=v[0], point3=v[1], 
     point1=p.InterestingPoint(edge=e[0], rule=MIDDLE))
-f, e, d = p.faces, p.edges, p.datums
-t = p.MakeSketchTransform(sketchPlane=f[1], sketchUpEdge=e[0], 
-    sketchPlaneSide=SIDE1, origin=(0.0, 0.0, 0.0715))
-s1 = mdb.models['test'].ConstrainedSketch(name='wheel_cut', sheetSize=2.82, 
-    gridSpacing=0.07, transform=t)
-s1.setPrimaryObject(option=SUPERIMPOSE)
-p.projectReferencesOntoSketch(sketch=s1, filter=COPLANAR_EDGES)
-s1.CircleByCenterPerimeter(center=(0.0, 0.0), point1=(0.0, -0.3))
 
-pickedFaces = f.getSequenceFromMask(mask=('[#2 ]', ), )
-p.PartitionFaceBySketch(sketchUpEdge=e[0], faces=pickedFaces, sketch=s1)
 
-pickedCells = c.getSequenceFromMask(mask=('[#1 ]', ), )
-p.PartitionCellByDatumPlane(datumPlane=d[4], cells=pickedCells)
-pickedCells = c.getSequenceFromMask(mask=('[#3 ]', ), )
+p.PartitionCellByDatumPlane(datumPlane=d[4], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
+p.PartitionCellByDatumPlane(datumPlane=d[6], cells=c.getSequenceFromMask(mask=('[#3 ]', ), )) 
+p.PartitionCellByDatumPlane(datumPlane=d[5], cells=c.getSequenceFromMask(mask=('[#f ]', ), ))
 
-p.PartitionCellByDatumPlane(datumPlane=d[6], cells=pickedCells)
-
-pickedCells = c.getSequenceFromMask(mask=('[#f ]', ), )
-p.PartitionCellByDatumPlane(datumPlane=d[5], cells=pickedCells)
-
-'''
-pickedCells = c.getSequenceFromMask(mask=('[#ff ]', ), )
-
-pickedEdges =(e[14], e[27], e[39], e[41])
-p.PartitionCellByExtrudeEdge(line=e[4], cells=pickedCells, edges=pickedEdges, 
-    sense=FORWARD)   
-'''
 #sleeper section assignment
 mdb.models['test'].HomogeneousSolidSection(name='sleeper_section', material='sleeper', thickness=None)
 p = mdb.models['test'].parts['sleeper']
@@ -373,20 +381,59 @@ p = mdb.models['test'].parts['sleeper']
 p.SectionAssignment(region=region, sectionName='sleeper_section', offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
 
 #sleeper roller boundary and surfaces
-p = mdb.models['test'].parts['sleeper']
 s = p.faces
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#4 ]', ), ), name='bottom')
 p.Set(faces=s.getSequenceFromMask(mask=('[#20 ]', ), ), name='roller')
 
 #partitioning sleeper for mesh
-c = p.cells
 p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.763)#, isDependent=False)
 p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.913)#, isDependent=False)
 d = p.datums
 p.PartitionCellByDatumPlane(datumPlane=d[5], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
 p.PartitionCellByDatumPlane(datumPlane=d[6], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#400 ]', ), ), name='rail_cont')
-	
+
+#sleeper1 section assignment
+p = mdb.models['test'].parts['sleeper1']
+c = p.cells
+cells = c.getSequenceFromMask(mask=('[#1 ]', ), )
+region = p.Set(cells=cells, name='Set-1')
+p.SectionAssignment(region=region, sectionName='sleeper_section', offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
+
+#sleeper1 roller boundary and surfaces
+s = p.faces
+p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#4 ]', ), ), name='bottom')
+p.Set(faces=s.getSequenceFromMask(mask=('[#28 ]', ), ), name='roller')
+
+#partitioning sleeper1 for mesh
+p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.763)#, isDependent=False)
+p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.913)#, isDependent=False)
+d = p.datums
+p.PartitionCellByDatumPlane(datumPlane=d[5], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
+p.PartitionCellByDatumPlane(datumPlane=d[6], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
+p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#400 ]', ), ), name='rail_cont')
+
+#sleeper2 section assignment
+p = mdb.models['test'].parts['sleeper2']
+c = p.cells
+cells = c.getSequenceFromMask(mask=('[#1 ]', ), )
+region = p.Set(cells=cells, name='Set-1')
+p.SectionAssignment(region=region, sectionName='sleeper_section', offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='', thicknessAssignment=FROM_SECTION)
+
+#sleeper2 roller boundary and surfaces
+s = p.faces
+p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#4 ]', ), ), name='bottom')
+p.Set(faces=s.getSequenceFromMask(mask=('[#28 ]', ), ), name='roller')
+
+
+#partitioning sleeper2 for mesh
+p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.763)#, isDependent=False)
+p.DatumPlaneByOffset(plane=p.faces[5], flip=SIDE2, offset=0.913)#, isDependent=False)
+d = p.datums
+p.PartitionCellByDatumPlane(datumPlane=d[5], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
+p.PartitionCellByDatumPlane(datumPlane=d[6], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
+p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#400 ]', ), ), name='rail_cont')
+
 
 #partitioning rail for mesh
 p = mdb.models['test'].parts['rail']
@@ -397,6 +444,7 @@ p.PartitionCellByPlanePointNormal(normal=e[16], cells=pickedCells, point=p.Inter
 pickedCells = c.getSequenceFromMask(mask=('[#3 ]', ), )
 e1, v2, d2 = p.edges, p.vertices, p.datums
 p.PartitionCellByPlanePointNormal(point=v2[6], normal=e1[7], cells=pickedCells)
+
 
 #rail surfaces
 p = mdb.models['test'].parts['rail']
@@ -412,6 +460,8 @@ for i in ['soil','ballast','subballast']:
     p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#2 ]', ), ), name='top')
     p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#10 ]', ), ), name='side_1')
     p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#20 ]', ), ), name='side_2')
+    #p.Set(faces=s.getSequenceFromMask(mask=('[#4 ]', ), ), name='roller')
+	
 p = mdb.models['test'].parts['soil']
 s = p.faces
 p.Surface(side1Faces=s.getSequenceFromMask(mask=('[#1 ]', ), ), name='long')
@@ -462,60 +512,59 @@ p.PartitionCellByDatumPlane(datumPlane=d[11], cells=c.getSequenceFromMask(mask=(
 p.PartitionCellByDatumPlane(datumPlane=d[12], cells=c.getSequenceFromMask(mask=('[#1 ]', ), ))
 p.PartitionCellByDatumPlane(datumPlane=d[13], cells=c.getSequenceFromMask(mask=('[#2 ]', ), ))
 
+#roller for substructure and rail
+p = mdb.models['test'].parts['ballast']
+s = p.faces
+p.Set(faces=s.getSequenceFromMask(mask=('[#10000 ]', ), ), name='roller')
+
+p = mdb.models['test'].parts['soil']
+s = p.faces
+p.Set(faces=s.getSequenceFromMask(mask=('[#0 #1 ]', ), ), name='roller')
+
+p = mdb.models['test'].parts['subballast']
+s = p.faces
+p.Set(faces=s.getSequenceFromMask(mask=('[#4000000 ]', ), ), name='roller')
+
+p = mdb.models['test'].parts['rail']
+s = p.faces
+p.Set(faces=s.getSequenceFromMask(mask=('[#30053c ]', ), ), name='roller')
+
+
 # assembly building 
-a1 = mdb.models['test'].rootAssembly
-for i in mdb.models['test'].parts.values():
-    a1.Instance(name=i.name+'-1', part=i, dependent=ON)
-
-a1.translate(instanceList=('subballast-1', ), vector=(6.0, 10.0, 0.0))
-a1.translate(instanceList=('ballast-1', ), vector=(8.1, 11.0, 0.0))
-a1.translate(instanceList=('soil-1', 'subballast-1', 'ballast-1', 'rail-1', 'sleeper-1', 'wheel-1'), vector=(-9.875, -11.35, -300.0))
-
-a1.rotate(instanceList=('sleeper-1', ), axisPoint=(-9.75, -11.14, -297.25), axisDirection=(0.0, -0.21, 0.0), angle=90.0)
-a1.translate(instanceList=('sleeper-1', ), vector=(7.0, 11.35, 297.25))
-a1.LinearInstancePattern(instanceList=('sleeper-1', ), direction1=(0.0, 0.0,-1.0), direction2=(0.0, 1.0, 0.0), number1=501, number2=1,spacing1=0.6, spacing2=0.21)
-a1.translate(instanceList=('rail-1', ), vector=(9.00425, 11.613, 0.0))
-
-a1.translate(instanceList=('wheel-1', ), vector=(9.07575, 12.213, 299.9285))
-a1.rotate(instanceList=('wheel-1', ), axisPoint=(-0.79925, 0.363, 0.0), axisDirection=(0.0, 0.5, 0.0), angle=90.0)
-a1.translate(instanceList=('wheel-1', ), vector=(0.0, 0.0, -1.0))
-a1.translate(instanceList=('infi_long-1', ), vector=(-10.875, -11.35, -300.0))
-a1.translate(instanceList=('infi_bottom-1', ), vector=(-9.875, -12.35, -300.0))
-a1.translate(instanceList=('infi_2-1', ), vector=(-9.875, -11.35, -301.0))
-a1.translate(instanceList=('infi_1-1', ), vector=(-9.875, -11.35, 0.0))
-
-#merging sleepers
-
 a = mdb.models['test'].rootAssembly
-a.InstanceFromBooleanMerge(name='all_sleeper', instances=tuple([i for i in a1.instances.values() if 'sleeper' in i.name]), keepIntersections=ON, 
-       originalInstances=DELETE, domain=GEOMETRY)   
+for i in mdb.models['test'].parts.values():
+    a.Instance(name=i.name+'-1', part=i, dependent=ON)
+
+a.translate(instanceList=('subballast-1', ), vector=(6.0, 10.0, 0.0))
+a.translate(instanceList=('ballast-1', ), vector=(8.1, 11.0, 0.0))
+a.translate(instanceList=('sleeper-1', 'sleeper1-1', 'sleeper2-1'), vector=(9.75, 11.35, 298.625))
+a.rotate(instanceList=('sleeper-1', 'sleeper1-1', 'sleeper2-1'), axisPoint=(9.875, 11.0, 300.0), axisDirection=(0.0, -1.0, 0.0), angle=90.0)
+a.translate(instanceList=('sleeper-1', ), vector=(-1.375, 0.0, 0.0))
+a.translate(instanceList=('sleeper2-1', ), vector=(-1.375, 0.0, 0.125))
+a.translate(instanceList=('sleeper1-1', ), vector=(-1.375, 0.0, -299.875))
+a.LinearInstancePattern(instanceList=('sleeper-1', ), direction1=(0.0, 0.0,-1.0), direction2=(0.0, 1.0, 0.0), number1=501, number2=1,spacing1=0.6, spacing2=0.21)
+del a.features['sleeper-1']
+del a.features['sleeper-1-lin-501-1'] 
+
+a.translate(instanceList=('infi_long-1', ), vector=(-1.0, 0.0, 0.0))
+a.translate(instanceList=('infi_bottom-1', ), vector=(0.0, -1.0, 0.0))
+a.translate(instanceList=('infi_1-1', ), vector=(0.0, 0.0, 300.0))
+a.translate(instanceList=('infi_2-1', ), vector=(0.0, 0.0, -1.0))
+
+#situating wheel
+a.translate(instanceList=('rail-1', 'wheel-1'), vector=(9.00425, 11.613, 0.0))
+a.translate(instanceList=('wheel-1', ), vector=(0.0715, 0.6, 299.9285))
+a.rotate(instanceList=('wheel-1', ), axisPoint=(9.07575, 12.213, 300.0), axisDirection=(0.0, -0.25, 0.0), angle=270.0)
+a.translate(instanceList=('wheel-1', ), vector=(0.0, 0.0, -1.0))
+#merging sleepers
+a.InstanceFromBooleanMerge(name='all_sleeper', instances=tuple([i for i in a1.instances.values() if 'sleeper' in i.name]), keepIntersections=ON, originalInstances=DELETE, domain=GEOMETRY)   
 
 
-#cutting sleepers from side
-'''
-p = mdb.models['test'].parts['all_sleeper']
-c = p.cells
-pickedCells = c.getSequenceFromMask(mask=('[#0:23 #1c000 ]', ), )
-e1, v1, d1 = p.edges, p.vertices, p.datums
-p.PartitionCellByPlanePointNormal(normal=e1[7027], cells=pickedCells, 
-    point=p.InterestingPoint(edge=e1[7027], rule=MIDDLE))
-pickedCells = c.getSequenceFromMask(mask=('[#0:46 #80000000 #3 ]', ), )
-e, v, d = p.edges, p.vertices, p.datums
-p.PartitionCellByPlanePointNormal(normal=e[14045], cells=pickedCells, 
-    point=p.InterestingPoint(edge=e[14045], rule=MIDDLE))
-f1 = p.faces
-p.RemoveFaces(faceList = f1[4003:4004]+f1[4006:4008]+f1[4009:4010]+\
-    f1[4013:4016]+f1[4017:4018]+f1[4021:4022]+f1[4024:4026]+f1[4027:4029]+\
-    f1[8016:8017]+f1[8018:8019]+f1[8022:8026]+f1[8029:8030]+f1[8031:8034]+\
-    f1[8035:8037]+f1[8039:8040], deleteCells=False)
-'''
 # step module (analysis definition)
 mdb.models['test'].ExplicitDynamicsStep(name='loading', previous='Initial', timePeriod=0.1)
 mdb.models['test'].ExplicitDynamicsStep(name='moving', previous='loading', timePeriod=1.44)
-mdb.models['test'].fieldOutputRequests['F-Output-1'].setValues(variables=('U', 
-    'V', 'A', 'S'), timeInterval=0.01, timeMarks=ON)
-mdb.models['test'].historyOutputRequests['H-Output-1'].setValues(variables=(
-    'ETOTAL', ), timeInterval=0.01)
+mdb.models['test'].fieldOutputRequests['F-Output-1'].setValues(variables=('U','V', 'A', 'S'), timeInterval=0.01, timeMarks=ON)
+mdb.models['test'].historyOutputRequests['H-Output-1'].setValues(variables=('ETOTAL', ), timeInterval=0.01)
 
 
 # interaction TIE and FRICTION
@@ -554,3 +603,50 @@ mdb.models['test'].Tie(name='soil_long', master=a.instances['soil-1'].surfaces['
 
 mdb.models['test'].Tie(name='rail_slpr', master=a.instances['rail-1'].surfaces['bottom'], slave=a.instances['all_sleeper-1'].surfaces['rail_cont'], 
 	positionToleranceMethod=COMPUTED, adjust=ON, tieRotations=ON, thickness=ON)
+
+# setting boundary conditions roller and fixed
+a.SetByBoolean(name='roller', sets=(a.allInstances['all_sleeper-1'].sets['roller'],	a.allInstances['infi_1-1'].sets['roller'], 
+	a.allInstances['infi_2-1'].sets['roller'], a.allInstances['infi_bottom-1'].sets['roller'], a.allInstances['infi_long-1'].sets['roller'],
+	a.allInstances['soil-1'].sets['roller'],a.allInstances['ballast-1'].sets['roller'], a.allInstances['subballast-1'].sets['roller'], a.allInstances['rail-1'].sets['roller'],))
+
+a.SetByBoolean(name='fixed', sets=(	a.allInstances['infi_1-1'].sets['fixed'], a.allInstances['infi_2-1'].sets['fixed'], 
+	a.allInstances['infi_bottom-1'].sets['fixed'], a.allInstances['infi_long-1'].sets['fixed'], ))
+	
+mdb.models['test'].DisplacementBC(name='roller', createStepName='Initial', 
+        region=a.sets['roller'], u1=SET, u2=UNSET, u3=SET, ur1=UNSET, ur2=SET, ur3=UNSET, 
+        amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None)
+mdb.models['test'].EncastreBC(name='fixed', createStepName='Initial', region=a.sets['fixed'], localCsys=None)
+
+#setting wheel motion
+mdb.models['test'].DisplacementBC(name='wheel', createStepName='Initial', 
+        region=a.instances['wheel-1'].sets['Set-1'], u1=SET, u2=UNSET, u3=UNSET, ur1=UNSET, ur2=SET, ur3=SET, 
+        amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None)
+mdb.models['test'].boundaryConditions['wheel'].setValuesInStep(stepName='loading', u3=0.0)
+
+#applying load on wheel and gravity
+mdb.models['test'].TabularAmplitude(name='motion', timeSpan=STEP, smooth=SOLVER_DEFAULT, data=((0.0, 0.0), (0.5, 0.5)))
+mdb.models['test'].boundaryConditions['wheel'].setValuesInStep( stepName='moving', u3=-10.0, amplitude='motion')
+mdb.models['test'].Gravity(name='gravity', createStepName='loading', comp2=-9.8, distributionType=UNIFORM, field='')
+v1 = a.instances['wheel-1'].vertices
+verts1 = v1.getSequenceFromMask(mask=('[#2 ]', ), )
+mdb.models['test'].ConcentratedForce(name='axle_load', 
+	createStepName='loading', region=a.Set(vertices=verts1, name='Set-3'), cf2=-100000.0, 
+	distributionType=UNIFORM, field='', localCsys=None)
+
+
+#meshing
+#a = mdb.models['test'].rootAssembly
+#for i in mdb.models['test'].parts.values():
+#    a.Instance(name=i.name+'-1', part=i, dependent=ON)
+	
+p = mdb.models['test'].parts['sleeper1']
+p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
+p.generateMesh()
+p = mdb.models['test'].parts['all_sleeper']
+p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
+p.generateMesh()
+
+p = mdb.models['test'].parts['ballast']
+p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
+p.generateMesh()
+	
