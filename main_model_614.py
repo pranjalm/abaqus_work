@@ -21,62 +21,38 @@ import connectorBehavior
 
 #creating a model
 mdb.Model(name='test', modelType=STANDARD_EXPLICIT)
-a1 = mdb.models['test'].rootAssembly
-session.viewports['Viewport: 1'].setValues(displayedObject=a1)
 
-#soil material
-mdb.models['test'].Material(name='soil')
-mdb.models['test'].materials['soil'].Density(table=((2000.0, ), ))
-mdb.models['test'].materials['soil'].Elastic(table=((10000000.0, 0.49), ))
-mdb.models['test'].materials['soil'].MohrCoulombPlasticity(table=((35.0, 0), ), useTensionCutoff=True)
-mdb.models['test'].materials['soil'].mohrCoulombPlasticity.MohrCoulombHardening( table=((1000.0, 0.0), ))
-mdb.models['test'].materials['soil'].mohrCoulombPlasticity.TensionCutOff(table=((1420.0, 0.0), ))
-mdb.models['test'].materials['soil'].Damping(alpha=2.609, beta=0.000434)
+#mohr-coulamb materials
+mc_mat = {'ballast':[(2400.0, ), (140000000.0, 0.37), (51.0, 0), (1000.0, 0.0), (800.0, 0.0), 2.609, 0.000434],'subballast':[(2400.0, ), (70000000.0, 0.37), (40.5, 0), (1000.0, 0.0), (1170.0, 0.0), 2.609, 0.000434],
+		  'soil':[(2000.0, ), (10000000.0, 0.49), (35.0, 0), (1000.0, 0.0), (1420.0, 0.0), 2.609, 0.000434]}
+for i,j in mc_mat.items():
+	#soil material
+    mdb.models['test'].Material(name=i)
+    mdb.models['test'].materials[i].Density(table=(j[0], ))
+    mdb.models['test'].materials[i].Elastic(table=(j[1], ))
+    mdb.models['test'].materials[i].MohrCoulombPlasticity(table=(j[2], ), useTensionCutoff=True)
+    mdb.models['test'].materials[i].mohrCoulombPlasticity.MohrCoulombHardening( table=(j[3], ))
+    mdb.models['test'].materials[i].mohrCoulombPlasticity.TensionCutOff(table=(j[4], ))
+    mdb.models['test'].materials[i].Damping(alpha=j[5], beta=j[6])
 
-#subballast material
-mdb.models['test'].Material(name='subballast')
-mdb.models['test'].materials['subballast'].Density(table=((2400.0, ), ))
-mdb.models['test'].materials['subballast'].Elastic(table=((70000000.0, 0.37), ))
-mdb.models['test'].materials['subballast'].MohrCoulombPlasticity(table=((40.5, 0), ), useTensionCutoff=True)
-mdb.models['test'].materials['subballast'].mohrCoulombPlasticity.MohrCoulombHardening( table=((1000.0, 0.0), ))
-mdb.models['test'].materials['subballast'].mohrCoulombPlasticity.TensionCutOff(table=((1170.0, 0.0), ))
-mdb.models['test'].materials['subballast'].Damping(alpha=2.609, beta=0.000434)
-
-#ballast material
-mdb.models['test'].Material(name='ballast')
-mdb.models['test'].materials['ballast'].Density(table=((2400.0, ), ))
-mdb.models['test'].materials['ballast'].Elastic(table=((140000000.0, 0.37), ))
-mdb.models['test'].materials['ballast'].MohrCoulombPlasticity(table=((51, 0), ), useTensionCutoff=True)
-mdb.models['test'].materials['ballast'].mohrCoulombPlasticity.MohrCoulombHardening( table=((1000.0, 0.0), ))
-mdb.models['test'].materials['ballast'].mohrCoulombPlasticity.TensionCutOff(table=((800.0, 0.0), ))
-mdb.models['test'].materials['ballast'].Damping(alpha=2.609, beta=0.000434)
-
-#sleeper material
-mdb.models['test'].Material(name='sleeper')
-mdb.models['test'].materials['sleeper'].Density(table=((2400.0, ), ))
-mdb.models['test'].materials['sleeper'].Elastic(table=((30000000000.0, 0.2), ))
-
-#steel material
-mdb.models['test'].Material(name='steel')
-mdb.models['test'].materials['steel'].Density(table=((7850.0, ), ))
-mdb.models['test'].materials['steel'].Elastic(table=((200000000000.0, 0.3), ))
-
+#elastic materials	
+el_mat = {'steel':[(7850.0, ), (200000000000.0, 0.2)], 'sleeper':[(2400.0, ), (30000000000.0, 0.2)]}
+for i,j in el_mat.items():
+	#soil material
+    mdb.models['test'].Material(name=i)
+    mdb.models['test'].materials[i].Density(table=(j[0], ))
+    mdb.models['test'].materials[i].Elastic(table=(j[1], ))
 
 #soil sketch
 s = mdb.models['test'].ConstrainedSketch(name='soil', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.rectangle(point1=(0.0, 0.0), point2=(9.875, 10.0))
 
 #soil part
 p = mdb.models['test'].Part(name='soil', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['soil']
 p.BaseSolidExtrude(sketch=s, depth=300.0)
        
 #ballast sketch
 s = mdb.models['test'].ConstrainedSketch(name='ballast', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(-0.7, 0.0), point2=(0.0, 0.35))
 s.Line(point1=(0.0, 0.35), point2=(1.775, 0.35))
 s.Line(point1=(1.775, 0.35), point2=(1.775, 0.0))
@@ -84,14 +60,11 @@ s.Line(point1=(1.775, 0.0), point2=(-0.7, 0.0))
 
 #ballast part
 p = mdb.models['test'].Part(name='ballast', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['ballast']
 p.BaseSolidExtrude(sketch=s, depth=300.0)
 
 
 #subballast sketch
 s = mdb.models['test'].ConstrainedSketch(name='subballast', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(-2.0, 0.0), point2=(0.0, 1.0))
 s.Line(point1=(0.0, 1.0), point2=(3.875, 1.0))
 s.Line(point1=(3.875, 1.0), point2=(3.875, 0.0))
@@ -99,13 +72,10 @@ s.Line(point1=(3.875, 0.0), point2=(-2.0, 0.0))
 
 #subballast part
 p = mdb.models['test'].Part(name='subballast', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['subballast']
 p.BaseSolidExtrude(sketch=s, depth=300.0)
 
 #sleeper sketch
 s = mdb.models['test'].ConstrainedSketch(name='sleeper', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(0.0, 0.0), point2=(0.25, 0.0))
 s.Line(point1=(0.25, 0.0), point2=(0.2, 0.21))
 s.Line(point1=(0.2, 0.21), point2=(0.05, 0.21))
@@ -113,13 +83,10 @@ s.Line(point1=(0.05, 0.21), point2=(0.0,0.0))
 
 #sleeper part
 p = mdb.models['test'].Part(name='sleeper', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['sleeper']
 p.BaseSolidExtrude(sketch=s, depth=1.375)
 
 #sleeper1 sketch
 s = mdb.models['test'].ConstrainedSketch(name='sleeper1', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(0.0, 0.0), point2=(0.125, 0.0))
 s.Line(point1=(0.125, 0.0), point2=(0.075, 0.21))
 s.Line(point1=(0.075, 0.21), point2=(0.0, 0.21))
@@ -127,14 +94,11 @@ s.Line(point1=(0.0, 0.21), point2=(0.0,0.0))
 
 #sleeper1 part
 p = mdb.models['test'].Part(name='sleeper1', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['sleeper1']
 p.BaseSolidExtrude(sketch=s, depth=1.375)
 
 
 #sleeper2 sketch
 s = mdb.models['test'].ConstrainedSketch(name='sleeper2', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(0.0, 0.0), point2=(-0.125, 0.0))
 s.Line(point1=(-0.125, 0.0), point2=(-0.075, 0.21))
 s.Line(point1=(-0.075, 0.21), point2=(0.0, 0.21))
@@ -142,14 +106,11 @@ s.Line(point1=(0.0, 0.21), point2=(0.0,0.0))
 
 #sleeper2 part
 p = mdb.models['test'].Part(name='sleeper2', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['sleeper2']
 p.BaseSolidExtrude(sketch=s, depth=1.375)
 
 
 #rail sketch
 s = mdb.models['test'].ConstrainedSketch(name='rail', sheetSize=10.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.Line(point1=(0.0, 0.0), point2=(0.0, 0.10))
 s.Line(point1=(0.0, 0.10), point2=(0.0715, 0.1))
 s.Line(point1=(0.0715, 0.1), point2=(0.0715, 0.0))
@@ -161,18 +122,14 @@ s.Line(point1=(-0.04225,0.0), point2=(0.0,0.0))
 
 #rail part
 p = mdb.models['test'].Part(name='rail', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['rail']
 p.BaseSolidExtrude(sketch=s, depth=300.0)
 
 #wheel sketch
 s = mdb.models['test'].ConstrainedSketch(name='wheel', sheetSize=2.0)
-g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-s.setPrimaryObject(option=STANDALONE)
 s.CircleByCenterPerimeter(center=(0.0, 0.0), point1=(0.0, 0.5))
 
 #wheel part
 p = mdb.models['test'].Part(name='wheel', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-p = mdb.models['test'].parts['wheel']
 p.BaseSolidExtrude(sketch=s, depth=0.0715)
 
 #subballast section assignment
@@ -556,8 +513,9 @@ a.translate(instanceList=('rail-1', 'wheel-1'), vector=(9.00425, 11.613, 0.0))
 a.translate(instanceList=('wheel-1', ), vector=(0.0715, 0.6, 299.9285))
 a.rotate(instanceList=('wheel-1', ), axisPoint=(9.07575, 12.213, 300.0), axisDirection=(0.0, -0.25, 0.0), angle=270.0)
 a.translate(instanceList=('wheel-1', ), vector=(0.0, 0.0, -1.0))
+
 #merging sleepers
-a.InstanceFromBooleanMerge(name='all_sleeper', instances=tuple([i for i in a1.instances.values() if 'sleeper' in i.name]), keepIntersections=ON, originalInstances=DELETE, domain=GEOMETRY)   
+a.InstanceFromBooleanMerge(name='all_sleeper', instances=tuple([i for i in a.instances.values() if 'sleeper' in i.name]), keepIntersections=ON, originalInstances=DELETE, domain=GEOMETRY)   
 
 
 # step module (analysis definition)
@@ -634,19 +592,48 @@ mdb.models['test'].ConcentratedForce(name='axle_load',
 	distributionType=UNIFORM, field='', localCsys=None)
 
 
-#meshing
-#a = mdb.models['test'].rootAssembly
-#for i in mdb.models['test'].parts.values():
-#    a.Instance(name=i.name+'-1', part=i, dependent=ON)
-	
-p = mdb.models['test'].parts['sleeper1']
-p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
-p.generateMesh()
-p = mdb.models['test'].parts['all_sleeper']
-p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
-p.generateMesh()
+#meshing  are 50 mm, 50 mm, 500 mm, 250 mm, 500 mm and 1000 mm
+mesh_sizes = {'wheel':0.05, 'rail':0.05, 'all_sleeper':0.5, 'ballast':0.25, 'subballast':0.5,'subgrade':1.0 }
+for i in mdb.models['test'].parts.keys():
+    p = mdb.models['test'].parts[i]
+    if(i in list(mesh_sizes.keys())):
+        size=mesh_sizes[i]
+    else:
+        size=1.0
+    p.seedPart(size=size, deviationFactor=0.1, minSizeFactor=0.1)
+    p.generateMesh()
 
-p = mdb.models['test'].parts['ballast']
-p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
-p.generateMesh()
+elemType1 = mesh.ElemType(elemCode=AC3D8R, elemLibrary=EXPLICIT)
+elemType2 = mesh.ElemType(elemCode=AC3D6, elemLibrary=EXPLICIT)
+elemType3 = mesh.ElemType(elemCode=AC3D4, elemLibrary=EXPLICIT)
+infi_parts = ['infi_long','infi_bottom','infi_1','infi_2']
+infi_layers = ['[#1 ]','[#1 ]','[#b ]','[#34 ]']
+infi_all = ['[#3 ]','[#3 ]','[#3f ]','[#3f ]']
+infi_direction = [5,8,31,20]
+for i in range(4):
+    p = mdb.models['test'].parts[infi_parts[i]]
+    p.deleteMesh()
+    c = p.cells
+    cells = c.getSequenceFromMask(mask=(infi_layers[i], ), )
+    pickedRegions =(cells, )
+    p.setElementType(regions=pickedRegions, elemTypes=(elemType1, elemType2,elemType3))
+    pickedCells = c.getSequenceFromMask(mask=(infi_all[i], ), )
+    f = p.faces
+    p.assignStackDirection(referenceRegion=f[infi_direction[i]], cells=pickedCells)
+    pickedRegions = c.getSequenceFromMask(mask=(infi_all[i], ), )
+    p.setMeshControls(regions=pickedRegions, technique=SWEEP, algorithm=ADVANCING_FRONT)
+    p.seedPart(size=1.0, deviationFactor=0.1, minSizeFactor=0.1)
+    p.generateMesh()
 	
+mdb.Job(name='test_job', model='test', description='', type=ANALYSIS, 
+        atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+        memoryUnits=PERCENTAGE, explicitPrecision=SINGLE, 
+        nodalOutputPrecision=SINGLE, echoPrint=OFF, modelPrint=OFF, 
+        contactPrint=OFF, historyPrint=OFF, userSubroutine='', scratch='', 
+        resultsFormat=ODB, parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+        activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
+mdb.jobs['test_job'].writeInput(consistencyChecking=OFF)
+#mdb.jobs['test_job'].submit(consistencyChecking=OFF, datacheckJob=True)
+
+#mdb.jobs['test_job'].submit(consistencyChecking=OFF)	
+
