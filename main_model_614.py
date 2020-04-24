@@ -575,6 +575,16 @@ mdb.models['test'].DisplacementBC(name='roller', createStepName='Initial',
         amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None)
 mdb.models['test'].EncastreBC(name='fixed', createStepName='Initial', region=a.sets['fixed'], localCsys=None)
 
+#rigid wheel
+a = mdb.models['test'].rootAssembly
+v = a.instances['wheel-1'].vertices
+a.ReferencePoint(point=v[1])
+region2=a.instances['wheel-1'].sets['Set-1']
+r = a.referencePoints
+refPoints1=(r[1031], )
+region1=regionToolset.Region(referencePoints=refPoints1)
+mdb.models['test'].RigidBody(name='wheel_rigid', refPointRegion=region1, bodyRegion=region2)
+	
 #setting wheel motion
 mdb.models['test'].DisplacementBC(name='wheel', createStepName='Initial', 
         region=a.instances['wheel-1'].sets['Set-1'], u1=SET, u2=UNSET, u3=UNSET, ur1=UNSET, ur2=SET, ur3=SET, 
@@ -633,6 +643,11 @@ mdb.Job(name='test_job', model='test', description='', type=ANALYSIS,
         resultsFormat=ODB, parallelizationMethodExplicit=DOMAIN, numDomains=1, 
         activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
 mdb.jobs['test_job'].writeInput(consistencyChecking=OFF)
+
+#import fileinput
+#with fileinput.FileInput('test_job.inp', inplace=True, backup='.bak') as file:
+#    for line in file:
+#        line.replace('AC3D8R', 'CIN3D8')
 #mdb.jobs['test_job'].submit(consistencyChecking=OFF, datacheckJob=True)
 
 #mdb.jobs['test_job'].submit(consistencyChecking=OFF)	
