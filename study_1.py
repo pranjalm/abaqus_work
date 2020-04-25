@@ -21,7 +21,10 @@ import displayGroupOdbToolset as dgo
 import connectorBehavior
 import os
 
-#os.chdir(r"D:\PM")
+#change path to where this file is at
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 odbList=[fileN for fileN in os.listdir(".") if '.odb' in fileN]
 for k in odbList:
@@ -36,15 +39,16 @@ for k in odbList:
     #sf = {0:'00' , 270:'25',423:'50',540:'75',648:'100',738:'125',810:'150',886:'175',990:'200'}
     sf =   {0:'00', 630:'100' , 990:'200',1260:'400',1440:'600'}
     for i in [h+'_'+'blt',h+'_'+'sbt',h+'_'+'sbg']:
-        for j in [0,630,990,1260,1440]:
-            session.viewports['Viewport: 1'].odbDisplay.setFrame(step=1, frame=j)
+        for k,v in sf.items():
+        #for j in [0,270,423,540,648,738,810,886,990]:
+            session.viewports['Viewport: 1'].odbDisplay.setFrame(step=1, frame=k)
             session.viewports['Viewport: 1'].odbDisplay.setPrimaryVariable( variableLabel='V', outputPosition=NODAL, refinement=(COMPONENT, 'V2'))
             pth = session.paths[i]
-            session.XYDataFromPath(name=str(pth.name)+'_k'+sf[j], path=pth, includeIntersections=True, projectOntoMesh=False, pathStyle=PATH_POINTS, numIntervals=10, projectionTolerance=0, shape=DEFORMED, labelType=TRUE_DISTANCE)
-            #abq_ExcelUtilities.excelUtilities.XYtoExcel(xyDataNames=str(pth.name)+'_ic_k'+sf[j], trueName='')
-            x0 = session.xyDataObjects[str(pth.name)+'_k'+sf[j]]
+            session.XYDataFromPath(name=str(pth.name)+'_k'+v, path=pth, includeIntersections=True, projectOntoMesh=False, pathStyle=PATH_POINTS, numIntervals=10, projectionTolerance=0, shape=DEFORMED, labelType=TRUE_DISTANCE)
+        #abq_ExcelUtilities.excelUtilities.XYtoExcel(xyDataNames=str(pth.name)+'_ic_k'+sf[j], trueName='')
+            x0 = session.xyDataObjects[str(pth.name)+'_k'+v]
             session.xyReportOptions.setValues(layout=SEPARATE_TABLES)
-            session.writeXYReport(fileName=str(pth.name)+'_k'+sf[j]+'.txt', appendMode=OFF, xyData=(x0, ))
+            session.writeXYReport(fileName=str(pth.name)+'_k'+v+'.txt', appendMode=OFF, xyData=(x0, ))
 
 
 
