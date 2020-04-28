@@ -661,9 +661,9 @@ for i in mdb.models['test'].parts.keys():
     p.seedPart(size=size, deviationFactor=0.1, minSizeFactor=0.1)
     p.generateMesh()
 
-elemType1 = mesh.ElemType(elemCode=AC3D8, elemLibrary=EXPLICIT)
-elemType2 = mesh.ElemType(elemCode=AC3D6, elemLibrary=EXPLICIT)
-elemType3 = mesh.ElemType(elemCode=AC3D4, elemLibrary=EXPLICIT)
+elemType1 = mesh.ElemType(elemCode=AC3D8, elemLibrary=STANDARD)
+elemType2 = mesh.ElemType(elemCode=AC3D6, elemLibrary=STANDARD)
+elemType3 = mesh.ElemType(elemCode=AC3D4, elemLibrary=STANDARD)
 infi_parts = ['infi_long','infi_bottom','infi_1','infi_2']
 infi_layers = ['[#1 ]','[#1 ]','[#b ]','[#34 ]']
 infi_all = ['[#3 ]','[#3 ]','[#3f ]','[#3f ]']
@@ -684,14 +684,14 @@ for i in range(4):
     p.generateMesh()
 
 	
-mdb.Job(name='test_job_impl', model='test', description='', type=ANALYSIS, 
-        atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
-        memoryUnits=PERCENTAGE, explicitPrecision=SINGLE, 
-        nodalOutputPrecision=SINGLE, echoPrint=OFF, modelPrint=OFF, 
-        contactPrint=OFF, historyPrint=OFF, userSubroutine='', scratch='', 
-        resultsFormat=ODB, parallelizationMethodExplicit=DOMAIN, numDomains=1, 
-        activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
-mdb.jobs['test_job_impl'].writeInput(consistencyChecking=OFF)
+#mdb.Job(name='test_job_impl', model='test', description='', type=ANALYSIS, 
+#        atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+#        memoryUnits=PERCENTAGE, explicitPrecision=SINGLE, 
+#        nodalOutputPrecision=SINGLE, echoPrint=OFF, modelPrint=OFF, 
+#        contactPrint=OFF, historyPrint=OFF, userSubroutine='', scratch='', 
+#        resultsFormat=ODB, parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+#        activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
+#mdb.jobs['test_job_impl'].writeInput(consistencyChecking=OFF)
 
 #import fileinput
 #with fileinput.FileInput('test_job.inp', inplace=True, backup='.bak') as file:

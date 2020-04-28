@@ -431,7 +431,33 @@ a.YasymmBC(name='roller_bc', createStepName='Initial', region=region, localCsys=
 region = a1.sets['fixed_all']
 a.EncastreBC(name='fixed_bc', createStepName='Initial', region=region, localCsys=None)
 	
+#meshing
+elemType1 = mesh.ElemType(elemCode=AC3D8, elemLibrary=STANDARD)
+elemType2 = mesh.ElemType(elemCode=AC3D6, elemLibrary=STANDARD)
+elemType3 = mesh.ElemType(elemCode=AC3D4, elemLibrary=STANDARD)
+infi_parts = {'infi_1':['[#3ffffff ]',74],'infi_2':['[#3ffffff ]',97],'infi_bottom':['[#1 ]',3],'infi_side':['[#1 ]',0]}
+for i,j in infi_parts.items():
+    p = a.parts[i]
+    c, f = p.cells, p.faces
+    pickedCells = c.getSequenceFromMask(mask=(j[0], ), )
+    p.assignStackDirection(referenceRegion=f[j[1]], cells=pickedCells)
+    pickedRegions = c.getSequenceFromMask(mask=(j[0], ), )
+    p.deleteMesh(regions=pickedRegions)
+    pickedRegions = c.getSequenceFromMask(mask=(j[0], ), )
+    p.setMeshControls(regions=pickedRegions, technique=SWEEP, algorithm=ADVANCING_FRONT)
+    p.generateMesh()
+    cells = c.getSequenceFromMask(mask=(j[0], ), )
+    pickedRegions =(cells, )
+    p.setElementType(regions=pickedRegions, elemTypes=(elemType1, elemType2, elemType3))
 
-	
-    
+mesh_sizes = {'bb_layer':0.3, 'bb_rail':0.2, 'grout':0.2, 'pad':0.2, 'shell':0.2, 'substructure':2.0, 'wheel':0.1}
+for i in a.parts.keys():
+    p = a.parts[i]
+    if(i in list(mesh_sizes.keys())):
+        size=mesh_sizes[i]
+    else:
+        size=1.0
+    p.seedPart(size=size, deviationFactor=0.1, minSizeFactor=0.1)
+    p.generateMesh()
+
 
