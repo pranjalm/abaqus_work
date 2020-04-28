@@ -20,6 +20,8 @@ import xyPlot
 import displayGroupOdbToolset as dgo
 import connectorBehavior
 
+
+#mdb.models.changeKey(fromName='Model-1', toName='mgdd')
 mdb.Model(name='mgdd', modelType=STANDARD_EXPLICIT)
 a = mdb.models['mgdd']
 s = a.ConstrainedSketch(name='bb_rail', sheetSize=1.0)
@@ -381,27 +383,254 @@ a.fieldOutputRequests['F-Output-1'].setValues(variables=('A', 'S', 'U', 'V'), ti
 a.historyOutputRequests['H-Output-1'].setValues(variables=('ALLAE', ), timeInterval=0.01)
 
 #interaction
-a.ContactProperty('rough')
-a.interactionProperties['rough'].NormalBehavior(pressureOverclosure=HARD, allowSeparation=OFF, constraintEnforcementMethod=DEFAULT)
-a.interactionProperties['rough'].TangentialBehavior(formulation=ROUGH)
+
 a.ContactProperty('smooth')
 a.interactionProperties['smooth'].NormalBehavior(pressureOverclosure=HARD, allowSeparation=ON, constraintEnforcementMethod=DEFAULT)
 a.interactionProperties['smooth'].TangentialBehavior(formulation=FRICTIONLESS)
 
-a.ContactStd(name='global', createStepName='Initial')
-a.interactions['global'].includedPairs.setValuesInStep(stepName='Initial', useAllstar=ON)
-r21=a1.instances['wheel-1'].surfaces['bottom']
-r22=a1.instances['bb_rail-1'].surfaces['top']
-a.interactions['global'].contactPropertyAssignments.appendInStep(stepName='Initial', assignments=((GLOBAL, SELF, 'rough'), (r21, r22, 'smooth')))
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#80000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-1-bb_layer-1')
+region1= a1.surfaces['CP-1-bb_layer-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#400040 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-1-grout-1')
+region2= a1.surfaces['CP-1-grout-1']
+
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#100000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-2-bb_layer-1')
+region3= a1.surfaces['CP-2-bb_layer-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#208200 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-2-grout-1')
+region4= a1.surfaces['CP-2-grout-1']
+
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#200000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-3-bb_layer-1')
+region5= a1.surfaces['CP-3-bb_layer-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#100004 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-3-grout-1')
+region6= a1.surfaces['CP-3-grout-1']
+
+s1 =  a1.instances['infi_1-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#30c4900 #920124a4 #88888828 #400002 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-4-infi_1-1')
+region7= a1.surfaces['CP-4-infi_1-1']
+
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#8004888 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-4-bb_layer-1')
+region8= a1.surfaces['CP-4-bb_layer-1']
+
+s1 =  a1.instances['infi_2-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#4319200 #48049248 #24444446 #200004 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-5-infi_2-1')
+region9= a1.surfaces['CP-5-infi_2-1']
+
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#10002244 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-5-bb_layer-1')
+region10= a1.surfaces['CP-5-bb_layer-1']
+
+s1 =  a1.instances['substructure-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#2000000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-6-substructure-1')
+region11= a1.surfaces['CP-6-substructure-1']
+
+s1 =  a1.instances['bb_layer-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#2008422 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-6-bb_layer-1')
+region12= a1.surfaces['CP-6-bb_layer-1']
+
+s1 =  a1.instances['bb_rail-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#1 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-7-bb_rail-1')
+region13= a1.surfaces['CP-7-bb_rail-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#10000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-7-pad-1')
+region14= a1.surfaces['CP-7-pad-1']
+
+s1 =  a1.instances['bb_rail-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#4 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-8-bb_rail-1')
+region15= a1.surfaces['CP-8-bb_rail-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#40000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-8-pad-1')
+region16= a1.surfaces['CP-8-pad-1']
+
+s1 =  a1.instances['bb_rail-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#8 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-9-bb_rail-1')
+region17= a1.surfaces['CP-9-bb_rail-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#20000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-9-pad-1')
+region18= a1.surfaces['CP-9-pad-1']
+
+s1 =  a1.instances['bb_rail-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#2 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-10-bb_rail-1')
+region19= a1.surfaces['CP-10-bb_rail-1']
+
+s1 =  a1.instances['wheel-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#8 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-10-wheel-1')
+region20= a1.surfaces['CP-10-wheel-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#10000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-11-grout-1')
+region21= a1.surfaces['CP-11-grout-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#400040 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-11-shell-1')
+region22= a1.surfaces['CP-11-shell-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#20000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-12-grout-1')
+region23= a1.surfaces['CP-12-grout-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#208200 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-12-shell-1')
+region24= a1.surfaces['CP-12-shell-1']
+
+s1 =  a1.instances['grout-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#40000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-13-grout-1')
+region25= a1.surfaces['CP-13-grout-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#100004 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-13-shell-1')
+region26= a1.surfaces['CP-13-shell-1']
+
+s1 =  a1.instances['substructure-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#10042304 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-14-substructure-1')
+region27= a1.surfaces['CP-14-substructure-1']
+
+s1 =  a1.instances['infi_1-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#30c4900 #920124a4 #88888828 #400002 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-14-infi_1-1')
+region28= a1.surfaces['CP-14-infi_1-1']
+
+s1 =  a1.instances['substructure-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#20028448 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-15-substructure-1')
+region29= a1.surfaces['CP-15-substructure-1']
+
+s1 =  a1.instances['infi_2-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#4319200 #48049248 #24444446 #200004 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-15-infi_2-1')
+region30= a1.surfaces['CP-15-infi_2-1']
+
+s1 =  a1.instances['infi_bottom-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#2 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-16-infi_bottom-1')
+region31= a1.surfaces['CP-16-infi_bottom-1']
+
+s1 =  a1.instances['substructure-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#8000082 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-16-substructure-1')
+region32= a1.surfaces['CP-16-substructure-1']
+
+s1 =  a1.instances['infi_side-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#4 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-17-infi_side-1')
+region33= a1.surfaces['CP-17-infi_side-1']
+
+s1 =  a1.instances['substructure-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#100000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-17-substructure-1')
+region34= a1.surfaces['CP-17-substructure-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#40000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-18-shell-1')
+region35= a1.surfaces['CP-18-shell-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#100004 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-18-pad-1')
+region36= a1.surfaces['CP-18-pad-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#10000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-19-shell-1')
+region37= a1.surfaces['CP-19-shell-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#400040 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-19-pad-1')
+region38= a1.surfaces['CP-19-pad-1']
+
+s1 =  a1.instances['shell-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#20000 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-20-shell-1')
+region39= a1.surfaces['CP-20-shell-1']
+
+s1 =  a1.instances['pad-1'].faces
+side1Faces1 = s1.getSequenceFromMask(mask=('[#208200 ]', ), )
+a1.Surface(side1Faces=side1Faces1, name='CP-20-pad-1')
+region40= a1.surfaces['CP-20-pad-1']
+
+a.Tie(name='CP-1-bb_layer-1-grout-1', master=region1, slave=region2, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-2-bb_layer-1-grout-1', master=region3, slave=region4, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-3-bb_layer-1-grout-1', master=region5, slave=region6, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-4-infi_1-1-bb_layer-1', master=region8, slave=region7, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-5-infi_2-1-bb_layer-1', master=region10, slave=region9, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-6-substructure-1-bb_layer-1', master=region11, slave=region12, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-7-bb_rail-1-pad-1', master=region13, slave=region14, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-8-bb_rail-1-pad-1', master=region15, slave=region16, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-9-bb_rail-1-pad-1', master=region17, slave=region18, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+#a.Tie(name='CP-10-bb_rail-1-wheel-1', master=region19, slave=region20, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-11-grout-1-shell-1', master=region21, slave=region22, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-12-grout-1-shell-1', master=region23, slave=region24, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-13-grout-1-shell-1', master=region25, slave=region26, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-14-substructure-1-infi_1-1', master=region27, slave=region28, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-15-substructure-1-infi_2-1', master=region29, slave=region30, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-16-infi_bottom-1-substructure-1', master=region32, slave=region31, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-17-infi_side-1-substructure-1', master=region33, slave=region34, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-18-shell-1-pad-1', master=region35, slave=region36, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-19-shell-1-pad-1', master=region37, slave=region38, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+a.Tie(name='CP-20-shell-1-pad-1', master=region39, slave=region40, positionToleranceMethod=COMPUTED, adjust=ON, constraintEnforcement=SURFACE_TO_SURFACE)
+
+#mdb.models['mgdd'].constraints['CP-4-infi_1-1-bb_layer-1'].swapSurfaces()
+#mdb.models['mgdd'].constraints['CP-5-infi_2-1-bb_layer-1'].swapSurfaces()
+#mdb.models['mgdd'].constraints['CP-16-infi_bottom-1-substructure-1'].swapSurfaces()
+
+region1= a1.surfaces['CP-10-bb_rail-1']
+region2= a1.surfaces['CP-10-wheel-1']
+a.SurfaceToSurfaceContactStd(name='wheel_rail', createStepName='Initial', master=region2, slave=region1, sliding=FINITE, thickness=ON, interactionProperty='smooth', 
+	adjustMethod=NONE, initialClearance=OMIT, datumAxis=None, clearanceRegion=None)
+		
+		
+#amplitude
+import numpy as np
+amp_move = tuple(zip([j for j in np.arange(0, 1.0+0.01,0.01)],[i for i in np.arange(0,1.5+0.015, 0.015)]))
+amp_load = tuple(zip([j for j in np.arange(0, 0.1+0.01,0.01)],[i for i in np.arange(0,1.0+0.1, 0.1)]))
+a.TabularAmplitude(name='load', timeSpan=STEP, smooth=SOLVER_DEFAULT, data=amp_load )
+a.TabularAmplitude(name='motion', timeSpan=STEP, smooth=SOLVER_DEFAULT, data=amp_move )
 
 #load and BC
-a.TabularAmplitude(name='load', timeSpan=STEP, smooth=SOLVER_DEFAULT, data=((0.0, 0.0), (0.05, 0.5), (0.1, 1.0)))
-a.TabularAmplitude(name='motion', timeSpan=STEP, smooth=SOLVER_DEFAULT, data=((0.0, 0.0), (0.1, 0.1), (1.0, 1.0)))
-
 s = a1.instances['wheel-1'].faces
 side1Faces1 = s.getSequenceFromMask(mask=('[#2 ]', ), )
 region = a1.Surface(side1Faces=side1Faces1, name='wheel_top')
-a.Pressure(name='pressure_1', createStepName='loading', region=region, distributionType=UNIFORM, field='', magnitude=1000.0, amplitude='load')
+a.Pressure(name='pressure_1', createStepName='loading', region=region, distributionType=UNIFORM, field='', magnitude=6314890.0, amplitude='load')
 
 region = a1.instances['wheel-1'].sets['Set-1']
 a.DisplacementBC(name='motion', createStepName='Initial', region=region, u1=SET, u2=UNSET, u3=SET, ur1=UNSET, ur2=SET, ur3=UNSET, amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None)
@@ -442,22 +671,26 @@ for i,j in infi_parts.items():
     pickedCells = c.getSequenceFromMask(mask=(j[0], ), )
     p.assignStackDirection(referenceRegion=f[j[1]], cells=pickedCells)
     pickedRegions = c.getSequenceFromMask(mask=(j[0], ), )
-    p.deleteMesh(regions=pickedRegions)
-    pickedRegions = c.getSequenceFromMask(mask=(j[0], ), )
     p.setMeshControls(regions=pickedRegions, technique=SWEEP, algorithm=ADVANCING_FRONT)
+    p.seedPart(size=2.0, deviationFactor=0.1, minSizeFactor=0.1)
     p.generateMesh()
     cells = c.getSequenceFromMask(mask=(j[0], ), )
     pickedRegions =(cells, )
     p.setElementType(regions=pickedRegions, elemTypes=(elemType1, elemType2, elemType3))
 
 mesh_sizes = {'bb_layer':0.3, 'bb_rail':0.2, 'grout':0.2, 'pad':0.2, 'shell':0.2, 'substructure':2.0, 'wheel':0.1}
-for i in a.parts.keys():
+for i,j in mesh_sizes.items():
     p = a.parts[i]
-    if(i in list(mesh_sizes.keys())):
-        size=mesh_sizes[i]
-    else:
-        size=1.0
-    p.seedPart(size=size, deviationFactor=0.1, minSizeFactor=0.1)
+    p.seedPart(size=j, deviationFactor=0.1, minSizeFactor=0.1)
     p.generateMesh()
 
+#job submission
+mdb.Job(name='mgdd_job', model='mgdd', description='', type=ANALYSIS, atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+        memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
+        modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='', scratch='', resultsFormat=ODB, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
+mdb.jobs['mgdd_job'].writeInput(consistencyChecking=OFF)
+#mdb.ModelFromInputFile(name='mgdd_job', inputFileName='/home/pranjal/Desktop/data_anlys/abaqus_work/mgdd_job.inp')
 
+#mdb.Job(name='tst', model='mgdd_job', description='', type=ANALYSIS, atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+#	memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
+#	modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='', scratch='', resultsFormat=ODB, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
